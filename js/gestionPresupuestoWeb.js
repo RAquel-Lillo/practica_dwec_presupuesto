@@ -425,7 +425,7 @@ BorrarEtiquetasHandle.prototype.handleEvent = function (event) {
 let FormuClose = {
   handleEvent: function(e){
     this.formulario.remove(); // eliminar el formulario
-    this.botonEditar.removeAttribute("disabled"); // reactivar el botón editar
+    this.botonAnyadir.removeAttribute("disabled"); // reactivar el botón añadir
 
   }
 }
@@ -452,7 +452,7 @@ function crearHandleFormulario(event) {
   // Cerramos el formulario
   document.querySelector("form").remove(); 
 
-  // Volvemos a activar el botón de añadir gasto
+  // Volvemos a activar el botón de añadir gasto formulario
   document.getElementById("anyadirgasto-formulario").removeAttribute("disabled");
 }
 
@@ -467,7 +467,8 @@ function nuevoGastoWebFormulario(event) {
   // Evento para botón cancelar el formulario
   let cancelarHandler = Object.create(FormuClose);
   cancelarHandler.formulario = formulario;
-  cancelarHandler.botonEditar = event.currentTarget;
+  cancelarHandler.botonAnyadir = event.currentTarget;
+  
   formulario.querySelector("button.cancelar").addEventListener("click", cancelarHandler);
 
   // desactivar el botón de añadir mientras el formulario está abierto
