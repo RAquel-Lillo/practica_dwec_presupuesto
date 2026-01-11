@@ -267,6 +267,20 @@ function agruparGastos(periodo, etiquetas, fechaDesde, fechaHasta) {
   }, {}); // Valor inicial: objeto vacío
 }
 
+function transformarListadoEtiquetas(texto) {
+     if (!texto) {
+        return [];
+    }
+
+    return texto
+        // 1. Dividir usando varios separadores
+        .split(/[,\.;:\s]+/)
+        // 2. Eliminar etiquetas vacías
+        .filter(function(etiqueta) {
+            return etiqueta !== "";
+        });  
+}
+
 
 
 //objeto gasto
@@ -288,5 +302,6 @@ export   {
     calcularTotalGastos,
     calcularBalance,
     filtrarGastos,
-    agruparGastos
+    agruparGastos,
+    transformarListadoEtiquetas
 }
