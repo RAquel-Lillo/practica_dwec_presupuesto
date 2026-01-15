@@ -539,8 +539,11 @@ document.getElementById("formulario-filtrado").addEventListener("submit", filtra
 function guardarGastosWeb() {
   // Obtener el listado de gastos
    let gastos = gespre.listarGastos();
-
+// Convertir a string JSON y guardar en localStorage
+   localStorage.setItem("GestorGastosDWEC", JSON.stringify(gastos));
 }
+
+document.getElementById("guardar-gastos").addEventListener("click", guardarGastosWeb);
 
 export {
     mostrarDatoEnId,
