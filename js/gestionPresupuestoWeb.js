@@ -557,5 +557,6 @@ export {
     BorrarEtiquetasHandle,
     nuevoGastoWebFormulario,
     crearHandleFormulario,
-    filtrarGastosWeb
+    filtrarGastosWeb,
+    guardarGastosWeb
 }
