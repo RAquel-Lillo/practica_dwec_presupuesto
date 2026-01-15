@@ -542,15 +542,29 @@ function guardarGastosWeb() {
 // Convertir a string JSON y guardar en localStorage
    localStorage.setItem("GestorGastosDWEC", JSON.stringify(gastos));
 }
-
+//manejador para el botón guardar gastos
 document.getElementById("guardar-gastos").addEventListener("click", guardarGastosWeb);
 
 // Función para cargar gastos desde localStorage
 function cargarGastosWeb() {
   // Obtener datos del localStorage
    let datosAlmacenados = localStorage.getItem("GestorGastosDWEC");
+// Si no existe la clave, cargar array vacío
+   if (datosAlmacenados === null) {
+       gespre.cargarGastos([]);
+   } else {
+       // Convertir string JSON a array de objetos
+       let gastosRecuperados = JSON.parse(datosAlmacenados);
+       gespre.cargarGastos(gastosRecuperados);
+
+   }
+   // Repintar la interfaz
+   repintar();
 
 }
+//manejador para el botón cargar gastos
+document.getElementById("cargar-gastos").addEventListener("click", cargarGastosWeb);
+
 
 export {
     mostrarDatoEnId,
@@ -565,5 +579,6 @@ export {
     nuevoGastoWebFormulario,
     crearHandleFormulario,
     filtrarGastosWeb,
-    guardarGastosWeb
+    guardarGastosWeb,
+    cargarGastosWeb
 }
