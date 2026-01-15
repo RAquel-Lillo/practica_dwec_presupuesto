@@ -482,6 +482,10 @@ document.getElementById("anyadirgasto-formulario").addEventListener("click", nue
 
 
 
+// 2 evaluación
+
+
+
 export {
     mostrarDatoEnId,
     mostrarGastoWeb,
