@@ -239,6 +239,7 @@ function filtrarGastos(filtro) {
 }
 
 
+
 // La función va a sumar los valores (valor) de todos los gastos que pertenezcan al mismo mes dia o año
 function agruparGastos(periodo, etiquetas, fechaDesde, fechaHasta) {
     // Filtrar gastos según criterios
@@ -267,11 +268,12 @@ function agruparGastos(periodo, etiquetas, fechaDesde, fechaHasta) {
   }, {}); // Valor inicial: objeto vacío
 }
 
+
+// 2 evaluacion
 function transformarListadoEtiquetas(texto) {
      if (!texto) {
         return [];
     }
-
     return texto
         // 1. Dividir usando varios separadores
         .split(/[,\.;:\s]+/)
@@ -279,6 +281,22 @@ function transformarListadoEtiquetas(texto) {
         .filter(function(etiqueta) {
             return etiqueta !== "";
         });  
+}
+
+
+ function cargarGastos(gastosAlmacenamiento) {
+    // Reseteamos la variable global "gastos"
+   gastos = [];
+    // Procesamos cada gasto del listado pasado a la función
+   for (let g of gastosAlmacenamiento) {
+// Creamos un nuevo objeto mediante el constructor
+       let gastoRehidratado = new CrearGasto();
+       // Copiamos los datos del objeto guardado en el almacenamiento
+       Object.assign(gastoRehidratado, g);
+       // Añadimos el gasto rehidratado a "gastos"
+       gastos.push(gastoRehidratado);
+   }
+
 }
 
 
@@ -303,5 +321,6 @@ export   {
     calcularBalance,
     filtrarGastos,
     agruparGastos,
-    transformarListadoEtiquetas
+    transformarListadoEtiquetas,
+    cargarGastos
 }
