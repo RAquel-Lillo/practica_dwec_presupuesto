@@ -545,6 +545,13 @@ function guardarGastosWeb() {
 
 document.getElementById("guardar-gastos").addEventListener("click", guardarGastosWeb);
 
+// Función para cargar gastos desde localStorage
+function cargarGastosWeb() {
+  // Obtener datos del localStorage
+   let datosAlmacenados = localStorage.getItem("GestorGastosDWEC");
+
+}
+
 export {
     mostrarDatoEnId,
     mostrarGastoWeb,
