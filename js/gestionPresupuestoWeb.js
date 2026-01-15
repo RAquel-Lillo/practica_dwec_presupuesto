@@ -483,6 +483,56 @@ document.getElementById("anyadirgasto-formulario").addEventListener("click", nue
 
 
 // 2 evaluación
+function filtrarGastosWeb(event) {
+    // Prevenir el envío del formulario
+    event.preventDefault();
+    
+    // Recoger los datos del formulario
+    let descripcion = document.getElementById("formulario-filtrado-descripcion").value;
+    let valorMinimo = document.getElementById("formulario-filtrado-valor-minimo").value;
+    let valorMaximo = document.getElementById("formulario-filtrado-valor-maximo").value;
+    let fechaDesde = document.getElementById("formulario-filtrado-fecha-desde").value;
+    let fechaHasta = document.getElementById("formulario-filtrado-fecha-hasta").value;
+    let etiquetasTexto = document.getElementById("formulario-filtrado-etiquetas-tiene").value;
+    
+    // Crear objeto filtro
+    let filtro = {};
+    
+    if (descripcion) {
+        filtro.descripcionContiene = descripcion;
+    }
+    if (valorMinimo) {
+        filtro.valorMinimo = parseFloat(valorMinimo);
+    }
+    if (valorMaximo) {
+        filtro.valorMaximo = parseFloat(valorMaximo);
+    }
+    if (fechaDesde) {
+        filtro.fechaDesde = fechaDesde;
+    }
+    if (fechaHasta) {
+        filtro.fechaHasta = fechaHasta;
+    }
+    // Si hay etiquetas, transformarlas usando la función del paquete gestionPresupuesto.js
+    if (etiquetasTexto) {
+        filtro.etiquetasTiene = gespre.transformarListadoEtiquetas(etiquetasTexto);
+    }
+    
+    // Llamar a filtrarGastos
+    let gastosFiltrados = gespre.filtrarGastos(filtro);
+    
+    // Limpiar el contenedor antes de mostrar los resultados
+    let divListado = document.getElementById("listado-gastos-completo");
+    divListado.innerHTML = "";
+    
+    // Mostrar los gastos filtrados
+    for (let gasto of gastosFiltrados) {
+        mostrarGastoWeb("listado-gastos-completo", gasto);
+    }
+}
+
+// Asignar el manejador al evento submit del formulario
+document.getElementById("formulario-filtrado").addEventListener("submit", filtrarGastosWeb);
 
 
 
@@ -498,4 +548,5 @@ export {
     BorrarEtiquetasHandle,
     nuevoGastoWebFormulario,
     crearHandleFormulario,
+    filtrarGastosWeb
 }
