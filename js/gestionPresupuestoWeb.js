@@ -535,6 +535,12 @@ function filtrarGastosWeb(event) {
 document.getElementById("formulario-filtrado").addEventListener("submit", filtrarGastosWeb);
 
 
+// Función para guardar gastos en localStorage
+function guardarGastosWeb() {
+  // Obtener el listado de gastos
+   let gastos = gespre.listarGastos();
+
+}
 
 export {
     mostrarDatoEnId,
