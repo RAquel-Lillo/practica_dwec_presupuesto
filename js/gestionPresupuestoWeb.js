@@ -38,6 +38,26 @@ let formuEditarHandleApi = {
 }
 
 
+
+let eeditarHandleFormulario = {
+  handleEvent: function(event) {
+    event.preventDefault(); // Evitar el envío del formulario
+    //crear el formulario
+    let formu=document.getElementById("formulario-template").content.cloneNode(true);
+    let formulario=formu.querySelector("form");
+    formulario.descripcion.value=this.gasto.descripcion;
+    formulario.valor.value=this.gasto.valor;
+    formulario.fecha.value=new Date(this.gasto.fecha).toISOString().slice(0,10);
+    //evento para boton enviar
+    let forHandle=Object.create(formuHandle);
+    forHandle.gasto=this.gasto;
+    formulario.addEventListener("submit", forHandle,false);
+    //evento para boton enviar API
+    let forHandleApi=Object.create(formuHandleApi);
+    forHandleApi.gasto=this.gasto;
+    formu.querySelector("button.gasto-enviar-api").addEventListener("click", forHandleApi,false);
+}
+
 // Muestra un valor (texto o número) dentro de un elemento HTML por su id
 function mostrarDatoEnId(idElemento, valor) {
   // Busco en el documento el elemento con ese id
