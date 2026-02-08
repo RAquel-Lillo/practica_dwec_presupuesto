@@ -2,24 +2,28 @@
 import * as gespre from './gestionPresupuesto.js';
 
 //variables globales para interactuar con la API
-let urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/";
+let urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/raquellillo/";
 let usuario= document.getElementById("nombre_usuario").value;
 
-//objeto para boton enviarApi del formulario (editar gasto)
+//OBJETO PARA EDITAR CON FORMULARIO Y ENVIAR A API
 let formuEditarHandleApi = {
   handleEvent: async function(event) {
-    //creamos la url para obtener los datos del gasto
+    let usuario = document.getElementById("nombre_usuario").value;
+    if (!usuario) {
+      alert("Introduce tu nombre de usuario primero");
+      return;
+    }
+    
     let urlUsuario = urlBase + usuario + "/" + this.gasto.id;
-    //creamos una referencia al formulario
     let formulario = event.target.form;
-    //almacenamos el valor de los campos en variables
+    
     let descripcion = formulario.descripcion.value;
     let valor = Number(formulario.valor.value);
     let fecha = formulario.fecha.value;
     let etiquetas = formulario.etiquetas.value;
-    //creamos un nuevo gasto con los valores del formulario
+    
     let gasto = new gespre.CrearGasto(descripcion, valor, fecha, ...etiquetas.split(","));
-    //peticion fetch para actualizar el gasto en la API
+    
     let respuesta = await fetch(urlUsuario, {
       method: "PUT",
       headers: {
@@ -27,47 +31,77 @@ let formuEditarHandleApi = {
       },
       body: JSON.stringify(gasto)
     });
-    //comprobamos si la peticion ha tenido exito
+    
     if (respuesta.ok) {
-      console.log("Gasto actualizado correctamente en la API");
-      cargarGastosApi(); // recargar los gastos desde la API para mostrar el gasto actualizado
+      console.log("Gasto actualizado correctamente");
+      cargarGastosApi();
     } else {
-      console.error("Error al actualizar el gasto en la API");
+      console.error("Error al actualizar");
     }
   }
-}
+};
 
+// OBJETO PARA SUBMIT DEL FORMULARIO DE EDICIÓN (LOCAL)
+let formuEditarHandle = {
+  handleEvent: function(event) {
+    event.preventDefault();
+    let formulario = event.target;
+    
+    this.gasto.actualizarDescripcion(formulario.descripcion.value);
+    this.gasto.actualizarValor(Number(formulario.valor.value));
+    this.gasto.actualizarFecha(formulario.fecha.value);
+    
+    let etiquetas = formulario.etiquetas.value.split(",").map(e => e.trim()).filter(e => e);
+    this.gasto.borrarEtiquetas(...this.gasto.etiquetas);
+    if (etiquetas.length > 0) {
+      this.gasto.anyadirEtiquetas(...etiquetas);
+    }
+    
+    formulario.remove();
+    repintar();
+  }
+};
 
-
+// OBJETO PARA EDITAR (actualizado)
 let editarHandleFormulario = {
   handleEvent: function(event) {
-    event.preventDefault(); // Evitar el envío del formulario
-    //crear el formulario
-    let formu=document.getElementById("formulario-template").content.cloneNode(true);
-    let formulario=formu.querySelector("form");
-    formulario.descripcion.value=this.gasto.descripcion;
-    formulario.valor.value=this.gasto.valor;
-    formulario.fecha.value=new Date(this.gasto.fecha).toISOString().slice(0,10);
-    //evento para boton enviar
-    let forHandle=Object.create(formuHandle);
-    forHandle.gasto=this.gasto;
-    formulario.addEventListener("submit", forHandle,false);
-    //evento para boton enviar API
-    let forHandleApi=Object.create(formuHandleApi);
-    forHandleApi.gasto=this.gasto;
-    formu.querySelector("button.gasto-enviar-api").addEventListener("click", forHandleApi,false);
-
-    //evento para boton cancelar
+    event.preventDefault();
+    
+    let formu = document.getElementById("formulario-template").content.cloneNode(true);
+    let formulario = formu.querySelector("form");
+    
+    // Rellenar con datos del gasto
+    formulario.descripcion.value = this.gasto.descripcion;
+    formulario.valor.value = this.gasto.valor;
+    formulario.fecha.value = new Date(this.gasto.fecha).toISOString().slice(0,10);
+    formulario.etiquetas.value = this.gasto.etiquetas.join(", ");
+    
+    // Evento para submit local
+    let forHandle = Object.create(formuEditarHandle);
+    forHandle.gasto = this.gasto;
+    formulario.addEventListener("submit", forHandle, false);
+    
+    // Evento para enviar a API
+    let forHandleApi = Object.create(formuEditarHandleApi);
+    forHandleApi.gasto = this.gasto;
+    formu.querySelector("button.gasto-enviar-api").addEventListener("click", forHandleApi, false);
+    
+    // Evento para cancelar
     let cancelarHandler = Object.create(FormuClose);
     cancelarHandler.formulario = formulario;
     cancelarHandler.botonAnyadir = event.currentTarget;
-    formu.querySelector("button.cancelar").addEventListener("click", cancelarHandler,false);
-    //desactivar boton
-    event.currentTarget.disabled=true;
-    //añadir el formulario al documento
+    formu.querySelector("button.cancelar").addEventListener("click", cancelarHandler, false);
+    
+    // Deshabilitar botón
+    event.currentTarget.disabled = true;
+    
+    // Añadir formulario
     event.target.parentNode.append(formu);
   }
-}
+};
+
+
+
 
 // Muestra un valor (texto o número) dentro de un elemento HTML por su id
 function mostrarDatoEnId(idElemento, valor) {
@@ -719,7 +753,7 @@ async function cargarGastosApi(e){
   } else {
     alert("Error al cargar los gastos desde la API: " + respuesta.status);
   }
-  repintar();
+  
 
 }
 
