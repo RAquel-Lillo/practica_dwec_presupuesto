@@ -39,7 +39,7 @@ let formuEditarHandleApi = {
 
 
 
-let eeditarHandleFormulario = {
+let editarHandleFormulario = {
   handleEvent: function(event) {
     event.preventDefault(); // Evitar el envío del formulario
     //crear el formulario
@@ -56,6 +56,17 @@ let eeditarHandleFormulario = {
     let forHandleApi=Object.create(formuHandleApi);
     forHandleApi.gasto=this.gasto;
     formu.querySelector("button.gasto-enviar-api").addEventListener("click", forHandleApi,false);
+
+    //evento para boton cancelar
+    let cancelarHandler = Object.create(FormuClose);
+    cancelarHandler.formulario = formulario;
+    cancelarHandler.botonAnyadir = event.currentTarget;
+    formu.querySelector("button.cancelar").addEventListener("click", cancelarHandler,false);
+    //desactivar boton
+    event.currentTarget.disabled=true;
+    //añadir el formulario al documento
+    event.target.parentNode.append(formu);
+  }
 }
 
 // Muestra un valor (texto o número) dentro de un elemento HTML por su id
