@@ -1,6 +1,10 @@
 // importa libreria
 import * as gespre from './gestionPresupuesto.js';
 
+//variables globales para interactuar con la API
+let urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/";
+let usuario= document.getElementById("nombre_usuario").value;
+
 // Muestra un valor (texto o número) dentro de un elemento HTML por su id
 function mostrarDatoEnId(idElemento, valor) {
   // Busco en el documento el elemento con ese id
@@ -49,6 +53,18 @@ function mostrarGastoWeb(idElemento, gasto) {
             spanEtiqueta.addEventListener("click", borrarEtiquetaHandler);
             divEtiquetas.appendChild(spanEtiqueta);
     }
+
+    // Boton borrar Api
+    let borrarAPI = document.createElement("button");
+    borrarAPI.type = "button";
+    borrarAPI.className = "gasto-borrar-api";
+    borrarAPI.textContent = "Borrar (API)";
+    let borrarButApi = Object.create(BorrarHandleAPI);
+    borrarButApi.gasto = gasto;
+    borrarAPI.addEventListener("click", borrarButApi,false);
+    divGasto.appendChild(borrarAPI);
+
+    //Objeto para borrar gasto desde API
    
 
     // BOTÓN EDITAR (prompts)
@@ -62,6 +78,8 @@ function mostrarGastoWeb(idElemento, gasto) {
     botonBorrar.type = "button";
     botonBorrar.className = "gasto-borrar";
     botonBorrar.textContent = "Borrar";
+
+
 
     // ✅ NUEVO: BOTÓN EDITAR CON FORMULARIO
     let botonEditarFormulario = document.createElement("button");
@@ -95,6 +113,26 @@ function mostrarGastoWeb(idElemento, gasto) {
     // Añadir el gasto al contenedor
     elementoContenedor.appendChild(divGasto);
 }
+
+ let BorrarHandleAPI = {
+      handleEvent: async function(event) {
+        //creamos la url para obtener los datos del gasto
+        let urlUsuario = urlBase + usuario + "/" + this.gasto.id;
+
+        //petición Fetch para borrar el gasto
+        let respuesta = await fetch(urlUsuario, {
+          method: "DELETE"
+        });
+        //comprobamos si la petición ha tenido exito
+        if (respuesta.ok) {
+          alert("Gasto borrado correctamente desde la API");
+          //borramos el gasto del modelo de datos local
+          cargarGastosApi();
+        } else {
+          alert("Error al borrar el gasto desde la API: " + respuesta.status);
+        }
+    }
+  };
 
 // ✅ NUEVO: Función constructora para editar con formulario
 function EditarHandleFormulario() {}
@@ -464,6 +502,9 @@ function nuevoGastoWebFormulario(event) {
   // Añadir el evento al botón y llamar a esta función
   formulario.addEventListener("submit", crearHandleFormulario);
 
+  //Evento para boton enviar API del formulario
+  formulario.querySelector("button.gasto-enviar-api").addEventListener("click", formuCrearHandleApi,false);
+
   // Evento para botón cancelar el formulario
   let cancelarHandler = Object.create(FormuClose);
   cancelarHandler.formulario = formulario;
@@ -480,7 +521,37 @@ function nuevoGastoWebFormulario(event) {
 // Asignar el evento al botón de añadir gasto mediante formulario
 document.getElementById("anyadirgasto-formulario").addEventListener("click", nuevoGastoWebFormulario);
 
+async function formuCrearHandleApi(event) {
+  //creamos la url para añadir un nuevo gasto en la api
+  let urlUsuario = urlBase + usuario;
+  //creamos una referencia al formulario
+  let formulario = event.target.form;
+  //almacenamos el valor de los campos en variables
+  let descripcion = formulario.descripcion.value;
+  let valor = Number(formulario.valor.value);
+  let fecha = formulario.fecha.value;
+  let etiquetas = formulario.etiquetas.value;
+  //creamos un nuevo gasto con los valores del formulario
+  let gasto = new gespre.CrearGasto(descripcion, valor, fecha, ...etiquetas.split(","));
+  //petición Fetch para añadir el gasto a la API
+  let respuesta = await fetch(urlUsuario, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify(gasto)
+  });
 
+  if (respuesta.ok) {
+    // Si la respuesta es correcta, actualizamos la interfaz
+    console.log("Gasto añadido correctamente a la API");
+    cargarGastosApi(); // recargar los gastos desde la API para mostrar el nuevo gasto  
+  } else {
+    console.error("Error al enviar el gasto a la API");
+  }
+  //deshabilitamos el botón del formulario
+  document.getElementById("anyadirgasto-formulario").removeAttribute("disabled");
+}
 
 // 2 evaluación
 function filtrarGastosWeb(event) {
@@ -566,6 +637,27 @@ function cargarGastosWeb() {
 document.getElementById("cargar-gastos").addEventListener("click", cargarGastosWeb);
 
 
+async function cargarGastosApi(e){
+  //creamos la URL para obtener el listado de gastos del usuario
+  let urlUsuario = urlBase + usuario;
+
+  //petición Fetch
+  let respuesta = await fetch(urlUsuario);
+
+  if (respuesta.ok) {
+    let gastosApi = await respuesta.json();
+    gespre.cargarGastos(gastosApi);
+    repintar();
+  } else {
+    alert("Error al cargar los gastos desde la API: " + respuesta.status);
+  }
+  repintar();
+
+}
+
+document.getElementById("cargar-gastos-api").addEventListener("click", cargarGastosApi);
+
+
 export {
     mostrarDatoEnId,
     mostrarGastoWeb,
@@ -580,5 +672,6 @@ export {
     crearHandleFormulario,
     filtrarGastosWeb,
     guardarGastosWeb,
-    cargarGastosWeb
+    cargarGastosWeb,
+    cargarGastosApi
 }
