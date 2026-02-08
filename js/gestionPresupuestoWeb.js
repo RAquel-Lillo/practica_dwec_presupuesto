@@ -5,13 +5,47 @@ import * as gespre from './gestionPresupuesto.js';
 let urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/";
 let usuario= document.getElementById("nombre_usuario").value;
 
+//objeto para boton enviarApi del formulario (editar gasto)
+let formuEditarHandleApi = {
+  handleEvent: async function(event) {
+    //creamos la url para obtener los datos del gasto
+    let urlUsuario = urlBase + usuario + "/" + this.gasto.id;
+    //creamos una referencia al formulario
+    let formulario = event.target.form;
+    //almacenamos el valor de los campos en variables
+    let descripcion = formulario.descripcion.value;
+    let valor = Number(formulario.valor.value);
+    let fecha = formulario.fecha.value;
+    let etiquetas = formulario.etiquetas.value;
+    //creamos un nuevo gasto con los valores del formulario
+    let gasto = new gespre.CrearGasto(descripcion, valor, fecha, ...etiquetas.split(","));
+    //peticion fetch para actualizar el gasto en la API
+    let respuesta = await fetch(urlUsuario, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify(gasto)
+    });
+    //comprobamos si la peticion ha tenido exito
+    if (respuesta.ok) {
+      console.log("Gasto actualizado correctamente en la API");
+      cargarGastosApi(); // recargar los gastos desde la API para mostrar el gasto actualizado
+    } else {
+      console.error("Error al actualizar el gasto en la API");
+    }
+  }
+}
+
+
 // Muestra un valor (texto o número) dentro de un elemento HTML por su id
 function mostrarDatoEnId(idElemento, valor) {
   // Busco en el documento el elemento con ese id
   let elemento = document.getElementById(idElemento);
   elemento.textContent = valor;
   }
-  
+
+
 
 
 // esta funcion recibe el id del elemento contenedor y un objeto gasto (recordemos que gasto tiene: descripcion, fecha, valor, etiquetas)
@@ -64,7 +98,6 @@ function mostrarGastoWeb(idElemento, gasto) {
     borrarAPI.addEventListener("click", borrarButApi,false);
     divGasto.appendChild(borrarAPI);
 
-    //Objeto para borrar gasto desde API
    
 
     // BOTÓN EDITAR (prompts)
@@ -133,6 +166,7 @@ function mostrarGastoWeb(idElemento, gasto) {
         }
     }
   };
+
 
 // ✅ NUEVO: Función constructora para editar con formulario
 function EditarHandleFormulario() {}
@@ -244,6 +278,9 @@ EditarHandleFormulario.prototype.handleEvent = function(event) {
     
     console.log("Formulario añadido. ¿Visible?", formulario.offsetParent !== null);
 };
+
+
+
 
 
 function mostrarGastosAgrupadosWeb(idElemento, agrup, periodo) {
