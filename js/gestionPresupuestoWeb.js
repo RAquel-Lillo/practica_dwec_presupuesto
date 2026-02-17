@@ -86,13 +86,13 @@ let editarHandleFormulario = {
     // Evento para enviar a API
     let forHandleApi = Object.create(formuEditarHandleApi);
     forHandleApi.gasto = this.gasto;
-    formu.querySelector("button.gasto-enviar-api").addEventListener("click", forHandleApi, false);
+    formu.getElementById("gasto-enviar-api").addEventListener("click", forHandleApi, false);
     
     // Evento para cancelar
     let cancelarHandler = Object.create(FormuClose);
     cancelarHandler.formulario = formulario;
     cancelarHandler.botonAnyadir = e.currentTarget;
-    formu.querySelector("button.cancelar").addEventListener("click", cancelarHandler, false);
+    formu.getElementById("cancelar").addEventListener("click", cancelarHandler, false);
     
     // Deshabilitar botón
     e.currentTarget.disabled = true;
