@@ -482,6 +482,18 @@ function repintar() {
   for (let gasto of gastos) {
     mostrarGastoWeb("listado-gastos-completo", gasto);
   }
+
+  //2ºevaluacion
+  mostrarDatosEnId("presupuesto", gespre.mostrarPresupuesto());
+  mostrarDatosEnId("gastos-totales", gespre.calcularTotalGastos());
+  mostrarDatosEnId("balance-total", gespre.calcularBalance());
+
+  let lgastos = document.getElementById("listado-gastos-completo");
+  lgastos.innerHTML = "";
+  for (let gasto of gespre.listarGastos()) {
+      mostrarGastoWeb("listado-gastos-completo", gasto);
+  }
+  
 }
 
 
