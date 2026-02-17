@@ -2,20 +2,22 @@
 import * as gespre from './gestionPresupuesto.js';
 
 //variables globales para interactuar con la API
-let urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/raquellillo/";
-let usuario= document.getElementById("nombre_usuario").value;
+var urlBase= "https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/raquellillo/";
+var usuario= document.getElementById("nombre_usuario").value;
+
+
 
 //OBJETO PARA EDITAR CON FORMULARIO Y ENVIAR A API
 let formuEditarHandleApi = {
-  handleEvent: async function(event) {
+  handleEvent: async function(e) {
     let usuario = document.getElementById("nombre_usuario").value;
     if (!usuario) {
       alert("Introduce tu nombre de usuario primero");
       return;
     }
     
-    let urlUsuario = urlBase + usuario + "/" + this.gasto.id;
-    let formulario = event.target.form;
+    let urlUsuario = urlBase + usuario + "/" + this.gastoid;
+    let formulario = e.target.form;
     
     let descripcion = formulario.descripcion.value;
     let valor = Number(formulario.valor.value);
@@ -43,9 +45,9 @@ let formuEditarHandleApi = {
 
 // OBJETO PARA SUBMIT DEL FORMULARIO DE EDICIÓN (LOCAL)
 let formuEditarHandle = {
-  handleEvent: function(event) {
-    event.preventDefault();
-    let formulario = event.target;
+  handleEvent: function(e) {
+    e.preventDefault();
+    let formulario = e.target;
     
     this.gasto.actualizarDescripcion(formulario.descripcion.value);
     this.gasto.actualizarValor(Number(formulario.valor.value));
@@ -64,8 +66,8 @@ let formuEditarHandle = {
 
 // OBJETO PARA EDITAR (actualizado)
 let editarHandleFormulario = {
-  handleEvent: function(event) {
-    event.preventDefault();
+  handleEvent: function(e) {
+    e.preventDefault();
     
     let formu = document.getElementById("formulario-template").content.cloneNode(true);
     let formulario = formu.querySelector("form");
@@ -89,14 +91,14 @@ let editarHandleFormulario = {
     // Evento para cancelar
     let cancelarHandler = Object.create(FormuClose);
     cancelarHandler.formulario = formulario;
-    cancelarHandler.botonAnyadir = event.currentTarget;
+    cancelarHandler.botonAnyadir = e.currentTarget;
     formu.querySelector("button.cancelar").addEventListener("click", cancelarHandler, false);
     
     // Deshabilitar botón
-    event.currentTarget.disabled = true;
+    e.currentTarget.disabled = true;
     
     // Añadir formulario
-    event.target.parentNode.append(formu);
+    e.target.parentNode.append(formu);
   }
 };
 
@@ -213,12 +215,12 @@ function mostrarGastoWeb(idElemento, gasto) {
 }
 
  let BorrarHandleAPI = {
-      handleEvent: async function(event) {
+      handleEvent: async function(e) {
         //creamos la url para obtener los datos del gasto
-        let urlUsuario = urlBase + usuario + "/" + this.gasto.id;
+        let urlUsuario = urlBase + usuario + "/" + this.gastoid;
 
         //petición Fetch para borrar el gasto
-        let respuesta = await fetch(urlUsuario, {
+        let respuesta = await fetch (urlUsuario, {
           method: "DELETE"
         });
         //comprobamos si la petición ha tenido exito
@@ -236,9 +238,9 @@ function mostrarGastoWeb(idElemento, gasto) {
 // ✅ NUEVO: Función constructora para editar con formulario
 function EditarHandleFormulario() {}
 
-EditarHandleFormulario.prototype.handleEvent = function(event) {
+EditarHandleFormulario.prototype.handleEvent = function(e) {
    // ✅ DESHABILITAR EL BOTÓN que abrió el formulario
-    let botonQueAbrioFormulario = event.currentTarget;
+    let botonQueAbrioFormulario = e.currentTarget;
     botonQueAbrioFormulario.setAttribute("disabled", "disabled");
     
     // 1. Crear copia del formulario desde el template
@@ -259,8 +261,8 @@ EditarHandleFormulario.prototype.handleEvent = function(event) {
     // 4. CREAR MANEJADOR PARA SUBMIT
     function SubmitHandle() {}
     
-    SubmitHandle.prototype.handleEvent = function(event) {
-        event.preventDefault();
+    SubmitHandle.prototype.handleEvent = function(e) {
+        e.preventDefault();
         
         // Acceder a los campos del formulario
         let descripcion = this.formulario.querySelector("#descripcion").value;
@@ -308,7 +310,7 @@ EditarHandleFormulario.prototype.handleEvent = function(event) {
 
     function CancelarEditHandle() {}
     
-    CancelarEditHandle.prototype.handleEvent = function(event) {
+    CancelarEditHandle.prototype.handleEvent = function(e) {
         // ✅ RESTAURAR VISIBILIDAD de los elementos del gasto
         let gastoDiv = this.formulario.closest('.gasto');
         let elementosMostrar = gastoDiv.querySelectorAll('.gasto-descripcion, .gasto-fecha, .gasto-valor, .gasto-etiquetas, .gasto-editar, .gasto-borrar, .gasto-editar-formulario');
@@ -330,7 +332,7 @@ EditarHandleFormulario.prototype.handleEvent = function(event) {
     botonCancelar.addEventListener("click", cancelarHandler);
     
     // 6. AÑADIR FORMULARIO DENTRO DEL GASTO
-    let gastoDiv = event.currentTarget.closest('.gasto');
+    let gastoDiv = e.currentTarget.closest('.gasto');
     
     // ✅ OCULTAR SOLO los elementos originales (antes de añadir el formulario)
     let elementosOcultar = gastoDiv.querySelectorAll('.gasto-descripcion, .gasto-fecha, .gasto-valor, .gasto-etiquetas, .gasto-editar, .gasto-borrar, .gasto-editar-formulario');
@@ -488,7 +490,7 @@ function EditarHandle(gasto) {
   this.gasto = gasto;
 }
 // Definimos el método que actuará como manejador del evento click
-EditarHandle.prototype.handleEvent = function (event) {
+EditarHandle.prototype.handleEvent = function (e) {
   // Pedimos los nuevos datos al usuario con los prompts
   let nuevaDescripcion = prompt("Introduce la nueva descripción:", this.gasto.descripcion);
   let nuevoValor = prompt("Introduce el nuevo valor:", this.gasto.valor);
@@ -534,7 +536,7 @@ function BorrarHandle(gasto) {
   this.gasto = gasto;
 }
 // Definimos el método que actuará como manejador del evento click
-BorrarHandle.prototype.handleEvent = function (event) {
+BorrarHandle.prototype.handleEvent = function (e) {
   // Pedimos confirmación al usuario antes de borrar
   if (confirm("¿Estás seguro de que quieres borrar el gasto: '" + this.gasto.descripcion + "'?")) {
     // Borramos el gasto usando su id
@@ -549,7 +551,7 @@ BorrarHandle.prototype.handleEvent = function (event) {
 function BorrarEtiquetasHandle() {
   // Constructor vacío
 }
-BorrarEtiquetasHandle.prototype.handleEvent = function (event) {
+BorrarEtiquetasHandle.prototype.handleEvent = function (e) {
   // Pedir confirmación antes de borrar la etiqueta
   if (confirm("¿Estás seguro de que quieres borrar la etiqueta: '" + this.etiqueta + "'?")) {
     // Borrar la etiqueta específica
@@ -572,15 +574,15 @@ let FormuClose = {
   
 
 // Función manejadora para crear el manejador del formulario, recibe el evento submit
-function crearHandleFormulario(event) {
-  event.preventDefault(); // Evitar el envío del formulario
+function crearHandleFormulario(e) {
+  e.preventDefault(); // Evitar el envío del formulario
 
   // Vamos leyendo los campos del formulario
   // Podemos acceder a la propiedad currentTarget del evento ya que lo hemos recibido como parámetro
-  let descripcion =event.currentTarget.descripcion.value;
-  let valor = Number(event.currentTarget.valor.value);
-  let fecha = event.currentTarget.fecha.value;
-  let etiquetas = event.currentTarget.etiquetas.value;
+  let descripcion =e.currentTarget.descripcion.value;
+  let valor = Number(e.currentTarget.valor.value);
+  let fecha = e.currentTarget.fecha.value;
+  let etiquetas = e.currentTarget.etiquetas.value;
 
   // Llamamos a la función para crear el gasto
   let gasto = new gespre.CrearGasto(descripcion, valor, fecha, ...etiquetas.split(","));
@@ -597,7 +599,7 @@ function crearHandleFormulario(event) {
 }
 
 
-function nuevoGastoWebFormulario(event) {
+function nuevoGastoWebFormulario(e) {
   let plantillaFormulario = document.getElementById("formulario-template").content.cloneNode(true);
   let formulario = plantillaFormulario.querySelector("form");
 
@@ -610,24 +612,24 @@ function nuevoGastoWebFormulario(event) {
   // Evento para botón cancelar el formulario
   let cancelarHandler = Object.create(FormuClose);
   cancelarHandler.formulario = formulario;
-  cancelarHandler.botonAnyadir = event.currentTarget;
+  cancelarHandler.botonAnyadir = e.currentTarget;
   
   formulario.querySelector("button.cancelar").addEventListener("click", cancelarHandler);
 
   // desactivar el botón de añadir mientras el formulario está abierto
-  event.currentTarget.disabled = true;  
+  e.currentTarget.disabled = true;  
 
   // Añadir el formulario al documento
-  event.target.parentNode.append(plantillaFormulario);
+  e.target.parentNode.append(plantillaFormulario);
 }
 // Asignar el evento al botón de añadir gasto mediante formulario
 document.getElementById("anyadirgasto-formulario").addEventListener("click", nuevoGastoWebFormulario);
 
-async function formuCrearHandleApi(event) {
+async function formuCrearHandleApi(e) {
   //creamos la url para añadir un nuevo gasto en la api
   let urlUsuario = urlBase + usuario;
   //creamos una referencia al formulario
-  let formulario = event.target.form;
+  let formulario = e.target.form;
   //almacenamos el valor de los campos en variables
   let descripcion = formulario.descripcion.value;
   let valor = Number(formulario.valor.value);
@@ -636,10 +638,10 @@ async function formuCrearHandleApi(event) {
   //creamos un nuevo gasto con los valores del formulario
   let gasto = new gespre.CrearGasto(descripcion, valor, fecha, ...etiquetas.split(","));
   //petición Fetch para añadir el gasto a la API
-  let respuesta = await fetch(urlUsuario, {
+  let respuesta = await fetch (urlUsuario, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json; charset=utf-8"
+      'Content-Type': 'application/json; charset=utf-8'
     },
     body: JSON.stringify(gasto)
   });
@@ -656,9 +658,9 @@ async function formuCrearHandleApi(event) {
 }
 
 // 2 evaluación
-function filtrarGastosWeb(event) {
+function filtrarGastosWeb(e) {
     // Prevenir el envío del formulario
-    event.preventDefault();
+    e.preventDefault();
     
     // Recoger los datos del formulario
     let descripcion = document.getElementById("formulario-filtrado-descripcion").value;
@@ -749,11 +751,11 @@ async function cargarGastosApi(e){
   if (respuesta.ok) {
     let gastosApi = await respuesta.json();
     gespre.cargarGastos(gastosApi);
-    repintar();
+    
   } else {
     alert("Error al cargar los gastos desde la API: " + respuesta.status);
   }
-  
+  repintar();
 
 }
 
